@@ -8,7 +8,7 @@
 * [Error handling](#error-handling)
 * [Versions](#versions)
 * [Record limits](#record-limits)
-* [Request & Response Examples](#request-response-examples)
+* [Request & Response Examples](#request--response-examples)
 * [Mock Responses](#mock-responses)
 * [JSONP](#jsonp)
 
@@ -18,9 +18,9 @@ This document provides guidelines and examples for White House Web APIs, encoura
 
 This document borrows heavily from:
 * [Designing HTTP Interfaces and RESTful Web Services](http://munich2012.drupal.org/program/sessions/designing-http-interfaces-and-restful-web-services)
-* API Facade Pattern, by Brian Mulloy, Apigee
-* Web API Design, by Brian Mulloy, Apigee
-* [Fieldings Dissertation on REST](http://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm)
+* [API Facade Pattern](http://apigee.com/about/content/api-fa%C3%A7ade-pattern), by Brian Mulloy, Apigee
+* [Web API Design](http://pages.apigee.com/web-api-design-ebook.html), by Brian Mulloy, Apigee
+* [Fielding's Dissertation on REST](http://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm)
 
 ## Pragmatic REST
 
@@ -47,18 +47,18 @@ These guidelines aim to support a truly RESTful API. Here are a few exceptions:
 
 ### Good URL examples
 * List of magazines:
-    * http://www.example.gov/api/v1/magazines.json
+    * GET http://www.example.gov/api/v1/magazines.json
 * Filtering is a query:
-    * http://www.example.gov/api/v1/magazines.json?year=2011&sort=desc
-    * http://www.example.gov/api/v1/magazines.json?topic=economy&year=2011
+    * GET http://www.example.gov/api/v1/magazines.json?year=2011&sort=desc
+    * GET http://www.example.gov/api/v1/magazines.json?topic=economy&year=2011
 * A single magazine in JSON format:
-    * http://www.example.gov/api/v1/magazines/1234.json
+    * GET http://www.example.gov/api/v1/magazines/1234.json
 * All articles in (or belonging to) this magazine:
-    * http://www.example.gov/api/v1/magazines/1234/articles.json
+    * GET http://www.example.gov/api/v1/magazines/1234/articles.json
 * All articles in this magazine in XML format:
     * GET http://example.gov/api/v1/magazines/1234/articles.xml
 * Specify optional fields in a comma separated list:
-    * http://www.example.gov/api/v1/magazines/1234.json?fields=title,subtitle,date
+    * GET http://www.example.gov/api/v1/magazines/1234.json?fields=title,subtitle,date
 * Add a new article to a particular magazine:
     * POST http://example.gov/api/v1/magazines/1234/articles
 
@@ -73,6 +73,9 @@ These guidelines aim to support a truly RESTful API. Here are a few exceptions:
     * http://www.example.gov/magazines/2011/desc
 
 ## HTTP Verbs
+
+HTTP verbs, or methods, should be used in compliance with their definitions under the [HTTP/1.1](http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html) standard.
+The action taken on the representation will be contextual to the media type being worked on and its current state. Here's an example of how HTTP verbs map to create, read, update, delete operations in a particular context:
 
 | HTTP METHOD | POST            | GET       | PUT         | DELETE |
 | ----------- | --------------- | --------- | ----------- | ------ |
@@ -141,24 +144,22 @@ Use three simple, common response codes indicating (1) success, (2) failure due 
 ## Record limits
 
 * If no limit is specified, return results with a default limit.
-* To get records 50 through 75 do this:
+* To get records 51 through 75 do this:
     * http://example.gov/magazines?limit=25&offset=50
-    * offset=50 means, ‘begin with record number fifty’
-    * limit=25 means, ‘return 25 records’
+    * offset=50 means, ‘skip the first 50 records’
+    * limit=25 means, ‘return a maximum of 25 records’
 
-Information about record limits should also be included in the Example resonse. Example:
+Information about record limits and total available count should also be included in the response. Example:
 
     {
         "metadata": {
             "resultset": {
-                "count": 50,
+                "count": 227,
                 "offset": 25,
                 "limit": 25
             }
         },
-        "results": [
-            { .. }
-        ]
+        "results": []
     }
 
 ## Request & Response Examples
@@ -172,6 +173,8 @@ Information about record limits should also be included in the Example resonse. 
 ### GET /magazines
 
 Example: http://example.gov/api/v1/magazines.json
+
+Response body:
 
     {
         "metadata": {
@@ -218,6 +221,8 @@ Example: http://example.gov/api/v1/magazines.json
 
 Example: http://example.gov/api/v1/magazines/[id].json
 
+Response body:
+
     {
         "id": "1234",
         "type": "magazine",
@@ -235,17 +240,20 @@ Example: http://example.gov/api/v1/magazines/[id].json
 
 Example: Create – POST  http://example.gov/api/v1/magazines/[id]/articles
 
-    {
-        "title": "Raising Revenue",
-        "author_first_name": "Jane",
-        "author_last_name": "Smith",
-        "author_email": "jane.smith@example.gov",
-        "year": "2012"
-        "month": "August"
-        "day": "18"
-        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget ante ut augue scelerisque ornare. Aliquam tempus rhoncus quam vel luctus. Sed scelerisque fermentum fringilla. Suspendisse tincidunt nisl a metus feugiat vitae vestibulum enim vulputate. Quisque vehicula dictum elit, vitae cursus libero auctor sed. Vestibulum fermentum elementum nunc. Proin aliquam erat in turpis vehicula sit amet tristique lorem blandit. Nam augue est, bibendum et ultrices non, interdum in est. Quisque gravida orci lobortis... "
+Request body:
 
-    }
+    [
+        {
+            "title": "Raising Revenue",
+            "author_first_name": "Jane",
+            "author_last_name": "Smith",
+            "author_email": "jane.smith@example.gov",
+            "year": "2012",
+            "month": "August",
+            "day": "18",
+            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget ante ut augue scelerisque ornare. Aliquam tempus rhoncus quam vel luctus. Sed scelerisque fermentum fringilla. Suspendisse tincidunt nisl a metus feugiat vitae vestibulum enim vulputate. Quisque vehicula dictum elit, vitae cursus libero auctor sed. Vestibulum fermentum elementum nunc. Proin aliquam erat in turpis vehicula sit amet tristique lorem blandit. Nam augue est, bibendum et ultrices non, interdum in est. Quisque gravida orci lobortis... "
+        }
+    ]
 
 
 ## Mock Responses
@@ -258,7 +266,7 @@ Note: If the mock parameter is included in a request to the production environme
 
 ## JSONP
 
-JSONP is easiest explained with an example. Here's a one from [StackOverflow](http://stackoverflow.com/questions/2067472/what-is-jsonp-all-about?answertab=votes#tab-top):
+JSONP is easiest explained with an example. Here's one from [StackOverflow](http://stackoverflow.com/questions/2067472/what-is-jsonp-all-about?answertab=votes#tab-top):
 
 > Say you're on domain abc.com, and you want to make a request to domain xyz.com. To do so, you need to cross domain boundaries, a no-no in most of browserland.
 
